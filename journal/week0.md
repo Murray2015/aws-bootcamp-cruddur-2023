@@ -25,3 +25,9 @@ See gitpod.yml in this repo
 
 ![Budget screenshot](assets/aws_budget.png)
 
+
+## Homework / stretch goals 
+
+I used the AWS well architected tool in the context of Crudder. See screenshot below for part way through. 
+
+![screenshot of well architected tool](assets/well_architected_tool.png)
