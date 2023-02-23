@@ -21,6 +21,8 @@ CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=4567"]
 # Stage 2 - make production image 
 FROM python:3.10-slim-buster
 
+RUN apt-get -y update; apt-get -y install curl
+
 WORKDIR /backend-flask
 
 ENV FLASK_ENV=development
@@ -30,4 +32,7 @@ COPY --from=builder /opt/venv /opt/venv
 COPY --from=builder /backend-flask .
 
 EXPOSE ${PORT}
+
+HEALTHCHECK CMD curl --fail http://localhost:4567/api/activities/home || exit 1
+
 CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=4567"]
