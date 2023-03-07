@@ -4,6 +4,7 @@ from flask import got_request_exception
 from flask_cors import CORS, cross_origin
 import logging
 import os
+import sys 
 from time import strftime
 
 from opentelemetry import trace
@@ -165,7 +166,7 @@ def data_home():
     # unauthenicatied request
     app.logger.debug(e)
     app.logger.debug("unauthenicated")
-    data = HomeActivities.run(LOGGER)
+    data = HomeActivities.run()
   return data, 200
 
 @app.route("/api/activities/notifications", methods=['GET'])
