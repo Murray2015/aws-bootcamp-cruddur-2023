@@ -21,7 +21,7 @@ from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
 import rollbar
 import rollbar.contrib.flask
 
-from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token, TokenVerifyError
+from lib.middleware.auth import auth_middleware
 
 from services.home_activities import *
 from services.user_activities import *
@@ -68,11 +68,8 @@ backend = os.getenv('BACKEND_URL')
 origins = [frontend, backend]
 
 
-cognito_jwt_token = CognitoJwtToken(
-  user_pool_id=os.getenv("AWS_COGNITO_USER_POOL_ID"), 
-  user_pool_client_id=os.getenv("AWS_COGNITO_USER_POOL_CLIENT_ID"),
-  region=os.getenv("AWS_DEFAULT_REGION")
-)
+# Register middleware 
+app.wsgi_app = auth_middleware(app.wsgi_app, logger=LOGGER)
 
 cors = CORS(
   app, 
@@ -154,19 +151,12 @@ def data_create_message():
 
 @app.route("/api/activities/home", methods=['GET'])
 def data_home():
-  access_token = extract_access_token(request.headers)
-  try:
-    claims = cognito_jwt_token.verify(access_token)
-    # authenicatied request
-    app.logger.debug("authenicated")
-    # app.logger.debug(claims)
-    # app.logger.debug(claims['username'])
+  if request.environ['is_authenticated']:
     data = HomeActivities.run(cognito_user_id=claims['username'])
-  except TokenVerifyError as e:
-    # unauthenicatied request
-    app.logger.debug(e)
-    app.logger.debug("unauthenicated")
+  elif request.environ['is_authenticated'] == False:
     data = HomeActivities.run()
+  else: 
+    raise Exception("Middleware is_authenticated missing!")
   return data, 200
 
 @app.route("/api/activities/notifications", methods=['GET'])
