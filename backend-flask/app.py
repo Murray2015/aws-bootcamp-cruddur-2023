@@ -152,7 +152,7 @@ def data_create_message():
 @app.route("/api/activities/home", methods=['GET'])
 def data_home():
   if request.environ['is_authenticated']:
-    data = HomeActivities.run(cognito_user_id=claims['username'])
+    data = HomeActivities.run(cognito_user_id="is logged in")
   elif request.environ['is_authenticated'] == False:
     data = HomeActivities.run()
   else: 
