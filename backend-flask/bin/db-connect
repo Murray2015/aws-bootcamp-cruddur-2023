@@ -1,3 +1,12 @@
 #! /usr/bin/bash 
 
-psql $CONNECTION_URL
+
+if [ "$1" == "prod" ]; then 
+    echo "Using prod" 
+    CON_URL=$PRODUCTION_CONNECTION_URL
+else 
+    echo "Using local" 
+    CON_URL=$CONNECTION_URL
+fi 
+
+psql $CON_URL

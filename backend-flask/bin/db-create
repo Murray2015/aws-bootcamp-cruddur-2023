@@ -5,6 +5,16 @@ NO_COLOR='\033[0m'
 LABEL="db-create"
 printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
-NO_DB_CONNECTION_URL=$(sed 's/\/crudder//g' <<< "$CONNECTION_URL")
+
+if [ "$1" == "prod" ]; then 
+    echo "Using prod" 
+    CON_URL=$PRODUCTION_CONNECTION_URL
+else 
+    echo "Using local" 
+    CON_URL=$CONNECTION_URL
+fi 
+
+
+NO_DB_CONNECTION_URL=$(sed 's/\/crudder//g' <<< "$CON_URL")
 
 psql $NO_DB_CONNECTION_URL -c "CREATE DATABASE crudder;" 
