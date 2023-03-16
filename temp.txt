@@ -1,0 +1,1 @@
+Problem looks like it's the selecting the uuid. (it's in the prod DB, but ending up as null in the query. )

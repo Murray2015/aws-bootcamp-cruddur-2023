@@ -18,7 +18,7 @@ def extract_access_token(request_headers):
     return access_token
 
 class CognitoJwtToken:
-    def __init__(self, user_pool_id, user_pool_client_id, region, request_client=None):
+    def __init__(self, user_pool_id, user_pool_client_id, region, request_client=None, logger=None):
         self.region = region
         if not self.region:
             raise FlaskAWSCognitoError("No AWS region provided")
@@ -30,6 +30,7 @@ class CognitoJwtToken:
         else:
             self.request_client = request_client
         self._load_jwk_keys()
+        self.logger = logger
 
 
     def _load_jwk_keys(self):
@@ -60,8 +61,7 @@ class CognitoJwtToken:
             raise TokenVerifyError("Public key not found in jwks.json")
         return self.jwk_keys[key_index]
 
-    @staticmethod
-    def _verify_signature(token, pkey_data):
+    def _verify_signature(self, token, pkey_data):
         try:
             # construct the public key
             public_key = jwk.construct(pkey_data)
@@ -73,6 +73,7 @@ class CognitoJwtToken:
         # decode the signature
         decoded_signature = base64url_decode(encoded_signature.encode("utf-8"))
         # verify the signature
+        # self.logger.debug(f"Here: {decoded_signature=}, {message=}, {encoded_signature=}")
         if not public_key.verify(message.encode("utf8"), decoded_signature):
             raise TokenVerifyError("Signature verification failed")
 
@@ -100,10 +101,12 @@ class CognitoJwtToken:
     def verify(self, token, current_time=None):
         """ https://github.com/awslabs/aws-support-tools/blob/master/Cognito/decode-verify-jwt/decode-verify-jwt.py """
         if not token:
+            self.logger.debug(f"{token=}, {current_time=}")
             raise TokenVerifyError("No token provided")
 
         headers = self._extract_headers(token)
         pkey_data = self._find_pkey(headers)
+        # self.logger.debug(f"{token=}, {pkey_data=}")
         self._verify_signature(token, pkey_data)
 
         claims = self._extract_claims(token)

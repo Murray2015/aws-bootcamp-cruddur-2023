@@ -1,15 +1,17 @@
-import uuid
 from datetime import datetime, timedelta, timezone
 
 from opentelemetry import trace
+
+from lib.db import db
 
 tracer = trace.get_tracer("CreateActivity")
 
 
 class CreateActivity:
-  def run(message, user_handle, ttl):
+  def run(message, user_handle, ttl, logger=None):
     with tracer.start_as_current_span("Create an activity"): 
       span = trace.get_current_span()
+      now = datetime.now()
       span.set_attribute("app.now", now.isoformat())
       model = {
         'errors': None,
@@ -49,13 +51,27 @@ class CreateActivity:
           'message': message
         }   
       else:
-        model['data'] = {
-          'uuid': uuid.uuid4(),
-          'display_name': 'Andrew Brown',
-          'handle':  user_handle,
-          'message': message,
-          'created_at': now.isoformat(),
-          'expires_at': (now + ttl_offset).isoformat()
-        }
-      span.set_attribute("app.errors", f"{model['errorrs']}")
+        expires_at = (now + ttl_offset)
+        uuid = CreateActivity.create_activity(user_handle, message, expires_at, logger)
+
+        object_json = CreateActivity.query_object_activity(uuid)
+        logger.debug(f"{object_json=}, {uuid=}, {expires_at=}")
+        model['data'] = object_json
       return model
+
+  def create_activity(handle, message, expires_at, logger):
+    sql = db.template('activities','create')
+    logger.debug(f"{sql=}")
+    uuid = db.query_commit(sql,{
+      'handle': handle,
+      'message': message,
+      'expires_at': expires_at
+    }, 
+    logger)
+    return uuid
+  
+  def query_object_activity(uuid):
+    sql = db.template('activities','object')
+    return db.query_object_json(sql,{
+      'uuid': uuid
+    })
