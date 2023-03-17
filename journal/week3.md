@@ -1,1 +1,3 @@
 # Week 3 — Decentralized Authentication
+
+Arg!! This hasn't been commited. The images are in the directory at joural/assets/week3, I'll remake this next.... 
