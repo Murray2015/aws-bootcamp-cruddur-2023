@@ -53,15 +53,15 @@ class CreateActivity:
       else:
         expires_at = (now + ttl_offset)
         uuid = CreateActivity.create_activity(user_handle, message, expires_at, logger)
-
         object_json = CreateActivity.query_object_activity(uuid)
-        logger.debug(f"{object_json=}, {uuid=}, {expires_at=}")
+        # logger.debug(f"{object_json=}, {uuid=}, {expires_at=}")
         model['data'] = object_json
       return model
 
   def create_activity(handle, message, expires_at, logger):
+    # logger.debug(f"In create_activity. {handle=}, {message=}, {expires_at=}")
     sql = db.template('activities','create')
-    logger.debug(f"{sql=}")
+    # logger.debug(f"{sql=}")
     uuid = db.query_commit(sql,{
       'handle': handle,
       'message': message,

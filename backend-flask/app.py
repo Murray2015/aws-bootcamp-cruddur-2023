@@ -185,12 +185,14 @@ def data_search():
 @app.route("/api/activities", methods=['POST','OPTIONS'])
 @cross_origin()
 def data_activities():
-  user_handle  = 'andrewbrown'
+  # LOGGER.debug(f"////In data_activities. {request.json}")
+  user_handle  = request.json.get('user', {}).get("handle", "No handle found!")
+  # LOGGER.debug(f"{user_handle=}")
   message = request.json['message']
   ttl = request.json['ttl']
-  LOGGER.debug(f"{message=}, {ttl=}")
+  # LOGGER.debug(f"{message=}, {ttl=}")
   model = CreateActivity.run(message, user_handle, ttl, LOGGER)
-  LOGGER.debug(f"{model=}")
+  # LOGGER.debug(f"{model=}")
   if model['errors'] is not None:
     return model['errors'], 422
   else:

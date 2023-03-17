@@ -30,6 +30,7 @@ class auth_middleware():
             # self.logger.debug(f"{access_token=}")
             claims = self.cognito_jwt_token.verify(access_token)
             self.logger.debug("Authenicated in middleware")
+            # self.logger.debug(f"{claims}")
             environ['is_authenticated'] = True
             return self.app(environ, start_response)
         except Exception as e:
