@@ -7,7 +7,7 @@ printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
 
 # seed_path=$(realpath .)/db/schema.sql
-seed_path="../db/seed.sql"
+seed_path="../../db/seed.sql"
 echo $seed_path
 
 

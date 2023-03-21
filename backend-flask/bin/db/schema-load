@@ -7,7 +7,7 @@ printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
 
 
 # schema_path=$(realpath .)/db/schema.sql
-schema_path="../db/schema.sql"
+schema_path="../../db/schema.sql"
 echo $schema_path
 
 
