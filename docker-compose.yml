@@ -16,8 +16,8 @@ services:
       AWS_COGNITO_USER_POOL_ID: 'ca-central-1_Q20PcGRcg'
       AWS_COGNITO_USER_POOL_CLIENT_ID: '3eoc5q8cj2l5ghi27h6mqsivcq'
       # CONNECTION_URL: "${CONNECTION_URL}"
-      # CONNECTION_URL: "postgresql://postgres:password@db:5432/crudder"
-      CONNECTION_URL: "${PRODUCTION_CONNECTION_URL}"
+      CONNECTION_URL: "postgresql://postgres:password@db:5432/crudder"
+      # CONNECTION_URL: "${PRODUCTION_CONNECTION_URL}"
     build: ./backend-flask
     ports:
       - "4567:4567"

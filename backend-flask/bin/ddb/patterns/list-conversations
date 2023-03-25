@@ -10,24 +10,8 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 parent_path = os.path.abspath(os.path.join(current_path, '..', '..', ".."))
 sys.path.append(parent_path)
 from lib.db import db
+from .utls import get_my_user_uuid
 
-
-def get_my_user_uuid():
-  sql = """
-    SELECT 
-      users.uuid,
-      users.handle
-    FROM users
-    WHERE
-      users.handle = %(my_handle)s 
-  """
-  user = db.query_array_json(sql, {
-    'my_handle':  'andrewbrown'
-  })
-
-  print('get_user_user_uuid')
-  print(user)
-  return user[0]['uuid']
 
 
 # my_user_uuid = "b200ea73-762e-4d69-a116-51eb22766070" # my fake andrew brown user in postgres
@@ -48,10 +32,13 @@ table_name = 'crudder-messages'
 
 
 # define the query parameters
+year = str(datetime.now().year)
 query_params = {
   'TableName': table_name,
   'KeyConditionExpression': 'pk = :pkey',
+  'ScanIndexForward': False,
   'ExpressionAttributeValues': {
+    ':year': {'S': year },
     ':pkey': {'S': f"GRP#{my_user_uuid}"}
   },
   'ReturnConsumedCapacity': 'TOTAL'
